@@ -11,14 +11,12 @@ RSpec.describe ImageDownloader do
     before do
       allow(FileUtils).to receive(:mkdir_p)
 
-      # rubocop:disable Security/Open
       allow(URI).to receive(:open)
         .with(url)
         .and_yield(image)
 
       allow(File).to receive(:binwrite)
     end
-    # rubocop:enable Security/Open
 
     context 'when the URL is valid' do
       it 'saves the downloaded image' do

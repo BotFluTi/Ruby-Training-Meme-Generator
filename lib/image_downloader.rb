@@ -11,9 +11,11 @@ class ImageDownloader
 
     file_path = "#{FOLDER_PATH}original_#{rand(1..30_000)}.png"
 
+    # rubocop:disable Security/Open
     URI.open(url) do |image|
       File.binwrite(file_path, image.read)
     end
+    # rubocop:enable Security/Open
 
     file_path
   rescue StandardError
