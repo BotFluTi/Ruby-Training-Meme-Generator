@@ -26,3 +26,6 @@ tmp/
 
 # Generated memes
 public/memes/
+
+images/*
+!images/.gitkeep
