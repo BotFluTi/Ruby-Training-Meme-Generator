@@ -29,3 +29,4 @@ public/memes/
 
 images/*
 !images/.gitkeep
+/generated-preview.png

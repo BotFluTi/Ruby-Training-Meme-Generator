@@ -11,7 +11,7 @@ class MemeGenerator
       c.gravity 'center'
       c.fill 'black'
       c.undercolor 'white'
-      c.font '/System/Library/Fonts/Helvetica.ttc'
+      c.font 'Arial'
       c.pointsize 20
       c.draw %(text 0,50 "#{text}")
     end

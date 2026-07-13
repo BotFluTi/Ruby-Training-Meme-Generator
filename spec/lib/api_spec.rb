@@ -13,7 +13,13 @@ RSpec.describe 'MemeData' do
     Sinatra::Application
   end
 
+  let(:service_result) { 'images/generated_123.png' }
+
   before do
+    allow(MemeService)
+      .to receive(:create)
+      .and_return(service_result)
+
     post '/memes', body, { 'CONTENT_TYPE' => 'application/json' }
   end
 
@@ -21,8 +27,6 @@ RSpec.describe 'MemeData' do
     let(:body) { File.read('spec/fixtures/meme_test.json') }
 
     it 'returns status code 303' do
-      post '/memes', body, { 'CONTENT_TYPE' => 'application/json' }
-
       expect(last_response.status).to eq(303)
     end
   end
