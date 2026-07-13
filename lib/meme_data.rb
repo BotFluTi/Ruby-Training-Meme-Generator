@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Meme
+class MemeData
   attr_reader :image_url, :text
 
   def initialize(image_url, text)
