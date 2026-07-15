@@ -30,3 +30,6 @@ public/memes/
 images/*
 !images/.gitkeep
 /generated-preview.png
+
+/db/*.sqlite3
+/config/
