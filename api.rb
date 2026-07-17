@@ -7,6 +7,7 @@ require 'securerandom'
 require 'sinatra'
 require 'sinatra/activerecord'
 require './lib/meme_controller'
+require './lib/user'
 
 set :database_file, 'config/database.yml'
 
@@ -35,35 +36,50 @@ end
 
 post '/signup' do
   body = JSON.parse(request.body.read)
-  user = body['user'] || {}
-  username = user['username']
-  password = user['password']
+  user_data = body['user'] || {}
+  username = user_data['username']
+  password = user_data['password']
 
   if username.nil? || username.empty?
     halt 400,
          { 'Content-Type' => 'application/json' },
-         {
-           errors: [
-             { message: 'Username is blank' }
-           ]
-         }.to_json
+         { errors: [{ message: 'Username is blank' }] }.to_json
   end
 
   if password.nil? || password.empty?
     halt 400,
          { 'Content-Type' => 'application/json' },
-         {
-           errors: [
-             { message: 'Password is blank' }
-           ]
-         }.to_json
+         { errors: [{ message: 'Password is blank' }] }.to_json
   end
 
+  halt 409 if User.exists?(username: username)
+
   token = SecureRandom.hex(16)
+
+  User.create!(
+    username: username,
+    password: password,
+    token: token
+  )
 
   [
     201,
     { 'Content-Type' => 'application/json' },
     { user: { token: token } }.to_json
+  ]
+end
+
+post '/login' do
+  body = JSON.parse(request.body.read)
+  credentials = body['user'] || {}
+
+  user = User.find_by(username: credentials['username'])
+
+  halt 409 unless user&.authenticate(credentials['password'])
+
+  [
+    200,
+    { 'Content-Type' => 'application/json' },
+    { user: { token: user.token } }.to_json
   ]
 end
