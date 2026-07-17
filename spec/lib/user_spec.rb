@@ -45,6 +45,54 @@ RSpec.describe User do
         expect(user.errors.full_messages).to include('Password is blank')
       end
     end
+
+    context 'with a duplicate username' do
+      subject(:user) do
+        described_class.new(
+          username: 'burnetete',
+          password: 'ananas',
+          token: 'second-token'
+        )
+      end
+
+      before do
+        described_class.delete_all
+
+        described_class.create!(
+          username: 'burnetete',
+          password: 'ananas',
+          token: 'first-token'
+        )
+      end
+
+      it 'is invalid' do
+        expect(user).not_to be_valid
+      end
+    end
+
+    context 'with a duplicate token' do
+      subject(:user) do
+        described_class.new(
+          username: 'second-user',
+          password: 'ananas',
+          token: 'same-token'
+        )
+      end
+
+      before do
+        described_class.delete_all
+
+        described_class.create!(
+          username: 'burnetete',
+          password: 'ananas',
+          token: 'same-token'
+        )
+      end
+
+      it 'is invalid' do
+        expect(user).not_to be_valid
+      end
+    end
   end
 
   describe 'password security' do

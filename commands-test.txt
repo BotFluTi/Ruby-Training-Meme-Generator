@@ -1,0 +1,54 @@
+$env:RACK_ENV = 'development'
+bundle exec rake db:migrate
+
+bundle exec ruby api.rb
+
+....................................................
+
+$signupBody = @{
+  user = @{
+    username = 'burnetete'
+    password = 'ananas'
+  }
+} | ConvertTo-Json -Depth 3
+
+$signupResponse = Invoke-RestMethod `
+  -Method Post `
+  -Uri 'http://localhost:4567/signup' `
+  -ContentType 'application/json' `
+  -Body $signupBody
+
+$token = $signupResponse.user.token
+$token
+
+....................................................
+
+$loginBody = @{
+  user = @{
+    username = 'burnetete'
+    password = 'ananas'
+  }
+} | ConvertTo-Json -Depth 3
+
+$loginResponse = Invoke-RestMethod `
+  -Method Post `
+  -Uri 'http://localhost:4567/login' `
+  -ContentType 'application/json' `
+  -Body $loginBody
+
+$token = $loginResponse.user.token
+$token
+
+....................................................
+
+$memeBody = @{
+  meme = @{
+    image_url = 'https://picsum.photos/600/400'
+    text = 'Hello world'
+  }
+} | ConvertTo-Json -Depth 3 -Compress
+
+$memeBody | curl.exe -i -X POST "http://localhost:4567/memes" `
+  -H "Authorization: Bearer $token" `
+  -H "Content-Type: application/json" `
+  --data-binary '@-'

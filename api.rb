@@ -12,11 +12,15 @@ require './lib/user'
 set :database_file, 'config/database.yml'
 
 post '/memes' do
+  scheme, token = request.env['HTTP_AUTHORIZATION']&.split
+
+  halt 401 unless scheme == 'Bearer' && User.exists?(token: token)
+
   body = JSON.parse(request.body.read)
   response = MemeController.new.execute(body)
 
   if response.message.nil?
-    redirect "/memes/#{response.redirect_url}", 303
+    redirect "/memes/#{response.redirect_url}", 307
   else
     halt 400,
          { 'Content-Type' => 'application/json' },

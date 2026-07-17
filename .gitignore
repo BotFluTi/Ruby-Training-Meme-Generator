@@ -32,5 +32,5 @@ images/*
 /generated-preview.png
 
 /db/*.sqlite3
-/config/
-/db/
+/db/*.sqlite3-shm
+/db/*.sqlite3-wal
