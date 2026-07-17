@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require './lib/json_parser'
-require './lib/meme_data'
+require './lib/services/json_parser'
+require './lib/models/meme_data'
 
 RSpec.describe JsonParser do
   describe '#parse' do

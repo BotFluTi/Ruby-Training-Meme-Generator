@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
+require './spec/spec_helper'
 
-require 'rack/test'
-require 'rspec'
-require_relative '../../api'
-require_relative '../../lib/user'
-
-RSpec.describe 'MemeData' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
+RSpec.describe 'POST /memes', type: :request do
   let(:service_result) { 'images/generated_123.png' }
 
   before do
@@ -81,6 +70,21 @@ RSpec.describe 'MemeData' do
 
     it 'returns an error message' do
       expect(response_body['message']).to include('Empty body')
+    end
+  end
+
+  context 'when the image cannot be downloaded' do
+    let(:body) { File.read('spec/fixtures/wrong_url_test.json') }
+    let(:service_result) { nil }
+    let(:response_body) { JSON.parse(last_response.body) }
+
+    it 'returns status code 400' do
+      expect(last_response.status).to eq(400)
+    end
+
+    it 'returns an error message' do
+      expect(response_body['message'])
+        .to include('Failed to download image')
     end
   end
 end

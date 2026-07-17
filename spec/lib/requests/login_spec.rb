@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
-
-require 'rack/test'
-require 'rspec'
-require_relative '../../api'
-require './lib/user'
+require './spec/spec_helper'
 
 RSpec.describe 'Login' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
   describe 'POST /login' do
     let(:fixture_body) { File.read('spec/fixtures/signup_test.json') }
     let(:credentials) { JSON.parse(fixture_body).fetch('user') }
@@ -57,7 +46,7 @@ RSpec.describe 'Login' do
       end
     end
 
-    context 'with an unknown username' do
+    context 'when the username does not exist' do
       let(:body) do
         {
           user: {

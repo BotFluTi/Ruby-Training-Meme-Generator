@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'stringio'
-require './lib/image_downloader'
+require './lib/services/image_downloader'
 
 RSpec.describe ImageDownloader do
   describe '.download' do

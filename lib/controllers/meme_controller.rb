@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require './lib/response'
-require './lib/json_parser'
-require './lib/meme_service'
+require './lib/models/response'
+require './lib/services/json_parser'
+require './lib/services/meme_service'
 
 class MemeController
   def execute(body)

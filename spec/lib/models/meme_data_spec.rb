@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require './lib/meme_data'
+require './lib/models/meme_data'
 
 RSpec.describe MemeData do
   describe '#initialize' do

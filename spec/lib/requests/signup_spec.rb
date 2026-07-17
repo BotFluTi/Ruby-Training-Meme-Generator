@@ -1,34 +1,14 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
+require './spec/spec_helper'
 
-require 'json'
-require 'rack/test'
-require 'rspec'
-require './lib/user'
-require_relative '../../api'
-
-RSpec.describe 'signup' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
+RSpec.describe 'SignUp' do
   let(:body) { File.read('spec/fixtures/signup_test.json') }
   let(:response_body) { JSON.parse(last_response.body) }
 
   before do
     User.delete_all
     post '/signup', body, { 'CONTENT_TYPE' => 'application/json' }
-  end
-
-  it 'returns status code 201' do
-    expect(last_response.status).to eq(201)
-  end
-
-  it 'returns an authentication token' do
-    expect(response_body.dig('user', 'token')).to be_a(String)
   end
 
   context 'when the username is blank' do
@@ -47,8 +27,6 @@ RSpec.describe 'signup' do
   end
 
   context 'when the user data is valid' do
-    let(:body) { File.read('spec/fixtures/signup_test.json') }
-
     it 'returns status code 201' do
       expect(last_response.status).to eq(201)
     end
@@ -74,8 +52,6 @@ RSpec.describe 'signup' do
   end
 
   context 'when the username already exists' do
-    let(:body) { File.read('spec/fixtures/signup_test.json') }
-
     before do
       post '/signup', body, { 'CONTENT_TYPE' => 'application/json' }
     end

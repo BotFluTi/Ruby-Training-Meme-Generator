@@ -1,20 +1,33 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'bcrypt'
 require 'json'
-require 'securerandom'
 require 'sinatra'
 require 'sinatra/activerecord'
-require './lib/meme_controller'
-require './lib/user'
+require './lib/controllers/meme_controller'
+require './lib/controllers/user_controller'
+require './lib/errors/existing_user_error'
+require './lib/errors/validation_error'
+require './lib/services/authorization_service'
 
 set :database_file, 'config/database.yml'
 
-post '/memes' do
-  scheme, token = request.env['HTTP_AUTHORIZATION']&.split
+error ExistingUserError do
+  halt 409
+end
 
-  halt 401 unless scheme == 'Bearer' && User.exists?(token: token)
+error ValidationError do
+  validation_error = env['sinatra.error']
+
+  halt 400,
+       { 'Content-Type' => 'application/json' },
+       { errors: validation_error.errors }.to_json
+end
+
+post '/memes' do
+  authorization_header = request.env['HTTP_AUTHORIZATION']
+
+  halt 401 unless AuthorizationService.authorized?(authorization_header)
 
   body = JSON.parse(request.body.read)
   response = MemeController.new.execute(body)
@@ -40,46 +53,20 @@ end
 
 post '/signup' do
   body = JSON.parse(request.body.read)
-  user_data = body['user'] || {}
-  username = user_data['username']
-  password = user_data['password']
-
-  if username.nil? || username.empty?
-    halt 400,
-         { 'Content-Type' => 'application/json' },
-         { errors: [{ message: 'Username is blank' }] }.to_json
-  end
-
-  if password.nil? || password.empty?
-    halt 400,
-         { 'Content-Type' => 'application/json' },
-         { errors: [{ message: 'Password is blank' }] }.to_json
-  end
-
-  halt 409 if User.exists?(username: username)
-
-  token = SecureRandom.hex(16)
-
-  User.create!(
-    username: username,
-    password: password,
-    token: token
-  )
+  user = UserController.new.signup(body)
 
   [
     201,
     { 'Content-Type' => 'application/json' },
-    { user: { token: token } }.to_json
+    { user: { token: user.token } }.to_json
   ]
 end
 
 post '/login' do
   body = JSON.parse(request.body.read)
-  credentials = body['user'] || {}
+  user = UserController.new.login(body)
 
-  user = User.find_by(username: credentials['username'])
-
-  halt 409 unless user&.authenticate(credentials['password'])
+  halt 409 unless user
 
   [
     200,

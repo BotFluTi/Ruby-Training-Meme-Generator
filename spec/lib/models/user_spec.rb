@@ -2,8 +2,8 @@
 
 ENV['RACK_ENV'] = 'test'
 
-require_relative '../../api'
-require './lib/user'
+require './api'
+require './lib/models/user'
 
 RSpec.describe User do
   describe 'validations' do

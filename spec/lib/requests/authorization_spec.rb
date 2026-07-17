@@ -1,18 +1,8 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
+require './spec/spec_helper'
 
-require 'rack/test'
-require 'rspec'
-require_relative '../../api'
-
-RSpec.describe 'Meme authorization' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
+RSpec.describe 'MemeAuth' do
   let(:body) { File.read('spec/fixtures/meme_test.json') }
 
   before do
