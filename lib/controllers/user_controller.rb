@@ -8,15 +8,12 @@ require './lib/models/user'
 class UserController
   def signup(body)
     user_data = body['user'] || {}
-    username = user_data['username']
 
-    raise ExistingUserError if User.exists?(username: username)
+    validate_user_data!(user_data)
 
-    user = User.new(
-      username: username,
-      password: user_data['password'],
-      token: SecureRandom.hex(16)
-    )
+    raise ExistingUserError if User.exists?(username: user_data['username'])
+
+    user = build_user(user_data)
 
     raise ValidationError, validation_errors(user) unless user.save
 
@@ -34,9 +31,27 @@ class UserController
 
   private
 
+  def validate_user_data!(user_data)
+    errors = []
+
+    errors << { message: 'Username is blank' } if user_data['username'].nil? || user_data['username'].empty?
+
+    errors << { message: 'Password is blank' } if user_data['password'].nil? || user_data['password'].empty?
+
+    raise ValidationError, errors unless errors.empty?
+  end
+
   def validation_errors(user)
     user.errors.full_messages.map do |message|
       { message: message }
     end
+  end
+
+  def build_user(user_data)
+    User.new(
+      username: user_data['username'],
+      password: user_data['password'],
+      token: SecureRandom.hex(16)
+    )
   end
 end
