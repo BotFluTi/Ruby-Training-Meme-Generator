@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require './lib/meme_generator'
+require './lib/services/meme_generator'
 
 RSpec.describe MemeGenerator do
   describe '.generate' do
@@ -9,6 +9,7 @@ RSpec.describe MemeGenerator do
     let(:generated_path) { 'images/generated_123.png' }
     let(:image) { instance_double(MiniMagick::Image) }
 
+    # rubocop:disable RSpec/VerifiedDoubles
     let(:options) do
       double(
         'image options',
@@ -20,6 +21,7 @@ RSpec.describe MemeGenerator do
         draw: nil
       )
     end
+    # rubocop:enable RSpec/VerifiedDoubles
 
     before do
       allow(MiniMagick::Image)
@@ -34,6 +36,7 @@ RSpec.describe MemeGenerator do
       allow(image).to receive(:write)
     end
 
+    # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
     it 'styles and centers the text' do
       described_class.generate(file_path, text)
 
@@ -44,6 +47,7 @@ RSpec.describe MemeGenerator do
       expect(options).to have_received(:draw)
         .with(%(text 0,50 "#{text}"))
     end
+    # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
 
     it 'writes the generated image' do
       described_class.generate(file_path, text)

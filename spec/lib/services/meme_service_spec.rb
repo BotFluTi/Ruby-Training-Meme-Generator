@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require './lib/meme_service'
-require './lib/meme_data'
-require './lib/image_downloader'
-require './lib/meme_generator'
+require './lib/services/meme_service'
+require './lib/models/meme_data'
+require './lib/services/image_downloader'
+require './lib/services/meme_generator'
 
 RSpec.describe MemeService do
   describe '.create' do

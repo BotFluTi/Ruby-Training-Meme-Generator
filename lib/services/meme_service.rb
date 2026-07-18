@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'image_downloader'
-require_relative 'meme_generator'
+require './lib/services/image_downloader'
+require './lib/services/meme_generator'
 
 class MemeService
   def self.create(meme_data)

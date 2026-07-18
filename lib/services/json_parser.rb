@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require './lib/meme_data'
+require './lib/models/meme_data'
+
 class JsonParser
   def parse(body)
     return nil if body.nil? || body.empty?

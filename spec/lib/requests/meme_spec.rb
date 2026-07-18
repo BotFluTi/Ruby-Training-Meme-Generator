@@ -1,33 +1,36 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = 'test'
+require './spec/spec_helper'
 
-require 'rack/test'
-require 'rspec'
-require_relative '../../api'
-
-RSpec.describe 'MemeData' do
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
+RSpec.describe 'POST /memes', type: :request do
   let(:service_result) { 'images/generated_123.png' }
 
   before do
+    User.delete_all
+
+    User.create!(
+      username: 'burnetete',
+      password: 'ananas',
+      token: 'valid-token'
+    )
+
     allow(MemeService)
       .to receive(:create)
       .and_return(service_result)
 
-    post '/memes', body, { 'CONTENT_TYPE' => 'application/json' }
+    post '/memes',
+         body,
+         {
+           'CONTENT_TYPE' => 'application/json',
+           'HTTP_AUTHORIZATION' => 'Bearer valid-token'
+         }
   end
 
   context 'when the request is correct' do
     let(:body) { File.read('spec/fixtures/meme_test.json') }
 
-    it 'returns status code 303' do
-      expect(last_response.status).to eq(303)
+    it 'returns status code 307' do
+      expect(last_response.status).to eq(307)
     end
   end
 
@@ -67,6 +70,21 @@ RSpec.describe 'MemeData' do
 
     it 'returns an error message' do
       expect(response_body['message']).to include('Empty body')
+    end
+  end
+
+  context 'when the image cannot be downloaded' do
+    let(:body) { File.read('spec/fixtures/wrong_url_test.json') }
+    let(:service_result) { nil }
+    let(:response_body) { JSON.parse(last_response.body) }
+
+    it 'returns status code 400' do
+      expect(last_response.status).to eq(400)
+    end
+
+    it 'returns an error message' do
+      expect(response_body['message'])
+        .to include('Failed to download image')
     end
   end
 end

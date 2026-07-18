@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require './lib/response'
+require './lib/models/response'
 
 RSpec.describe Response do
   describe '#initialize' do
